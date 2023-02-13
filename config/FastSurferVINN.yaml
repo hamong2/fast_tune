@@ -1,0 +1,71 @@
+MODEL:
+  MODEL_NAME: "FastSurferVINN"
+  NUM_CLASSES: 79
+  NUM_FILTERS: 71
+  KERNEL_H: 3
+  KERNEL_W: 3
+  BASE_RES: 1.0
+  OUT_TENSOR_WIDTH: 320
+  OUT_TENSOR_HEIGHT: 320
+  HEIGHT: 256
+  WIDTH: 256
+  # for axial
+  LOSS_FUNC: "combined"
+  NUM_FILTERS_INTERPOL: 32
+  NUM_CHANNELS: 7
+  STRIDE_CONV: 1
+  STRIDE_POOL: 2
+  POOL: 2
+  BASE_RES: 1.0
+  INTERPOLATION_MODE: "bilinear"
+  CROP_POSITION: "top_left"
+  OUT_TENSOR_WIDTH: 320
+  OUT_TENSOR_HEIGHT: 320
+
+DATA:
+  SIZES: [256, 311, 320]
+  PADDED_SIZE: 320
+  PLANE: "axial"
+  PATH_HDF5_TRAIN: "./dataset/example_4sub/train.hdf5"
+  PATH_HDF5_VAL: "./dataset/example_4sub/val.hdf5"
+  AUG: ["None", "Gaussian"]
+
+DATA_LOADER:
+  NUM_WORKERS: 1
+  PIN_MEMORY: True
+
+OPTIMIZER:
+  LR_SCHEDULER: cosineWarmRestarts
+  OPTIMIZING_METHOD: "adamW"
+
+  BASE_LR: 0.01
+  GAMMA: 0.3
+  STEP_SIZE: 5
+  ETA_MIN: 0.0001
+  T_ZERO: 10
+  T_MULT: 2
+  MOMENTUM: 0.9
+  DAMPENING: 0.0
+  NESTEROV: true
+  WEIGHT_DECAY: 0.0001
+
+TRAIN:
+  NUM_EPOCHS: 70
+  BATCH_SIZE: 8
+  LOG_INTERVAL: 50
+  NUM_STEPS: 10
+  NUM_EPOCHS: 3
+  FINE_TUNE: false
+  CHECKPOINT_PERIOD: 2
+  NUM_WORKERS: 1
+  RESUME: false
+  RESUME_EXPR_NUM: "Default"
+
+TEST:
+  BATCH_SIZE: 16
+
+LOG_DIR: "./experiments"
+EXPR_NUM: "bb"
+RNG_SEED: 1
+NUM_GPUS: 1
+# SUMMARY_PATH: "FastSurferVINN/summary"

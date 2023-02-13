@@ -1,0 +1,88 @@
+{
+  "MODEL": {
+    "MODEL_NAME": "FastSurferVINN",
+    "NUM_CLASSES": 79,
+    "LOSS_FUNC": "combined",
+    "NUM_FILTERS": 71,
+    "NUM_FILTERS_INTERPOL": 32,
+    "NUM_BLOCKS": 5,
+    "NUM_CHANNELS": 7,
+    "KERNEL_H": 3,
+    "KERNEL_W": 3,
+    "KERNEL_C": 1,
+    "STRIDE_CONV": 1,
+    "STRIDE_POOL": 2,
+    "POOL": 2,
+    "HEIGHT": 256,
+    "WIDTH": 256,
+    "BASE_RES": 1.0,
+    "INTERPOLATION_MODE": "bilinear",
+    "CROP_POSITION": "top_left",
+    "OUT_TENSOR_WIDTH": 320,
+    "OUT_TENSOR_HEIGHT": 320
+  },
+  "TRAIN": {
+    "BATCH_SIZE": 8,
+    "LOG_INTERVAL": 50,
+    "RESUME": false,
+    "RESUME_EXPR_NUM": "Default",
+    "NUM_EPOCHS": 3,
+    "NUM_STEPS": 10,
+    "FINE_TUNE": false,
+    "CHECKPOINT_PERIOD": 2,
+    "NUM_WORKERS": 1,
+    "EARLY_STOPPING": true,
+    "EARLY_STOPPING_MODE": "min",
+    "EARLY_STOPPING_PATIENCE": 10,
+    "EARLY_STOPPING_WAIT": 10,
+    "EARLY_STOPPING_DELTA": 1e-05
+  },
+  "TEST": {
+    "BATCH_SIZE": 16
+  },
+  "DATA": {
+    "PATH_HDF5_TRAIN": "./dataset/hdf5/val.hdf5",
+    "PATH_HDF5_VAL": "./dataset/hdf5/val.hdf5",
+    "PLANE": "axial",
+    "CLASS_OPTIONS": [
+      "aseg",
+      "aparc"
+    ],
+    "SIZES": [
+      "256 311 320"
+    ],
+    "PADDED_SIZE": 320,
+    "AUG": [
+      "None",
+      "Gaussian"
+    ]
+  },
+  "DATA_LOADER": {
+    "NUM_WORKERS": 8,
+    "PIN_MEMORY": true
+  },
+  "OPTIMIZER": {
+    "BASE_LR": 0.01,
+    "LR_SCHEDULER": "cosineWarmRestarts",
+    "GAMMA": 0.3,
+    "STEP_SIZE": 5,
+    "ETA_MIN": 0.0001,
+    "T_ZERO": 10,
+    "T_MULT": 2,
+    "FACTOR": 0.1,
+    "PATIENCE": 5,
+    "THRESH": 0.0001,
+    "COOLDOWN": 0,
+    "MOMENTUM": 0.9,
+    "DAMPENING": 0.0,
+    "NESTEROV": true,
+    "WEIGHT_DECAY": 0.0001,
+    "OPTIMIZING_METHOD": "adamW"
+  },
+  "NUM_GPUS": 1,
+  "LOG_DIR": "FastsurferVINN\\FastSurferVINN_axial",
+  "EXPR_NUM": "FastSurferVINN_axial",
+  "RNG_SEED": 1,
+  "SUMMARY_PATH": "FastsurferVINN\\FastSurferVINN_axial\\summary\\FastSurferVINN_axial",
+  "CONFIG_LOG_PATH": "FastsurferVINN\\FastSurferVINN_axial\\config\\FastSurferVINN_axial"
+}

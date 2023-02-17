@@ -118,7 +118,7 @@ class RunModelOnData:
             # run view agg on the cpu (either if the available GPU RAM is not big enough (<8 GB),
             # or if the model is anyhow run on cpu)
 
-        LOGGER.info(f"Running view aggregation on {self.viewagg_device}")
+        print(f"Running view aggregation on {self.viewagg_device}")
 
         try:
             self.lut = du.read_classes_from_lut(args.lut)
@@ -155,10 +155,10 @@ class RunModelOnData:
 
             # remove potential subject/mri doubling in outdir name
             out_dir = tmp if os.path.basename(tmp) != "mri" else os.path.dirname(os.path.dirname(tmp))
-        LOGGER.info("Output will be stored in: {}".format(out_dir))
+        print("Output will be stored in: {}".format(out_dir))
 
         if not os.path.exists(out_dir):
-            LOGGER.info("Output directory does not exist. Creating it now...")
+            print("Output directory does not exist. Creating it now...")
             os.makedirs(out_dir)
         return out_dir
 
@@ -173,7 +173,7 @@ class RunModelOnData:
 
         if not conf.is_conform(orig, conform_vox_size=self.vox_size, check_dtype=True, verbose=False,
                                conform_to_1mm_threshold=self.conform_to_1mm_threshold):
-            LOGGER.info("Conforming image")
+            print("Conforming image")
             orig = conf.conform(orig,
                                 conform_vox_size=self.vox_size, conform_to_1mm_threshold=self.conform_to_1mm_threshold)
             orig_data = np.asanyarray(orig.dataobj)
@@ -207,7 +207,7 @@ class RunModelOnData:
 
         # inference and view aggregation
         for plane, model in self.models.items():
-            LOGGER.info(f"Run {plane} prediction")
+            print(f"Run {plane} prediction")
             self.set_model(plane)
             # pred_prob is updated inplace to conserve memory
             pred_prob = model.run(pred_prob, orig_f, orig_data, zoom, out=pred_prob)
@@ -233,7 +233,7 @@ class RunModelOnData:
                  dtype: Union[None, type] = None):
         # Create output directory if it does not already exist.
         if not os.path.exists(os.path.dirname(save_as)):
-            LOGGER.info("Output image directory does not exist. Creating it now...")
+            print("Output image directory does not exist. Creating it now...")
             os.makedirs(os.path.dirname(save_as))
         np_data = data if isinstance(data, np.ndarray) else data.cpu().numpy()
 
@@ -244,7 +244,7 @@ class RunModelOnData:
             header = orig.header
 
         du.save_image(header, orig.affine, np_data, save_as, dtype=dtype)
-        LOGGER.info("Successfully saved image as {}".format(save_as))
+        print("Successfully saved image as {}".format(save_as))
 
     def set_up_model_params(self, plane, cfg, ckpt):
         self.view_ops[plane]["cfg"] = cfg
@@ -260,12 +260,12 @@ def handle_cuda_memory_exception(exception: RuntimeError, exit_on_out_of_memory:
     message = exception.args[0]
     if message.startswith("CUDA out of memory. "):
         LOGGER.critical("ERROR - INSUFFICIENT GPU MEMORY")
-        LOGGER.info("The memory requirements exceeds the available GPU memory, try using a smaller batch size "
+        print("The memory requirements exceeds the available GPU memory, try using a smaller batch size "
                     "(--batch_size <int>) and/or view aggregation on the cpu (--viewagg_device 'cpu')."
                     "Note: View Aggregation on the GPU is particularly memory-hungry at approx. 5 GB for standard "
                     "256x256x256 images.")
         memory_message = message[message.find("(") + 1:message.find(")")]
-        LOGGER.info(f"Using {memory_message}.")
+        print(f"Using {memory_message}.")
         if exit_on_out_of_memory:
             sys.exit("----------------------------\nERROR: INSUFFICIENT GPU MEMORY\n")
         else:
@@ -309,7 +309,8 @@ if __name__ == "__main__":
             If you are running FastSurfer in a docker container, you can specify the user with 
             '-u $(id -u):$(id -g)' (see https://docs.docker.com/engine/reference/run/#user).
             If you want to force running as root, you may pass --allow_root to run_prediction.py.
-            """)
+            """
+            )
 
     # Check input and output options
     if args.in_dir is None and args.csv_file is None and not os.path.isfile(args.orig_name):
@@ -332,32 +333,32 @@ if __name__ == "__main__":
             LOGGER.warning("The QC log file will not be saved.")
 
     # Set up logging
-    from utils.logging import setup_logging
+    # from utils.logging import setup_logging
 
-    setup_logging(args.log_name)
+    # setup_logging(args.log_name)
 
     # Download checkpoints if they do not exist
     # see utils/checkpoint.py for default paths
-    LOGGER.info("Checking or downloading default checkpoints ...")
+    print("Checking or downloading default checkpoints ...")
     get_checkpoints(args.ckpt_ax, args.ckpt_cor, args.ckpt_sag)
 
     # Set Up Model
     eval = RunModelOnData(args)
 
-    # Get all subjects of interest
+    # Get all subjects of interest 전체 이미지 경로 불러와서 실행시키는 부분
     if args.csv_file is not None:
         with open(args.csv_file, "r") as s_dirs:
             s_dirs = [line.strip() for line in s_dirs.readlines()]
-        LOGGER.info("Analyzing all {} subjects from csv_file {}".format(len(s_dirs), args.csv_file))
+        print("Analyzing all {} subjects from csv_file {}".format(len(s_dirs), args.csv_file))
 
     elif args.in_dir is not None:
         print(args.in_dir, args.search_tag)
         s_dirs = glob.glob(os.path.join(args.in_dir, args.search_tag))
-        LOGGER.info("Analyzing all {} subjects from in_dir {}".format(len(s_dirs), args.in_dir))
+        print("Analyzing all {} subjects from in_dir {}".format(len(s_dirs), args.in_dir))
 
     else:
         s_dirs = [os.path.dirname(args.orig_name)]
-        LOGGER.info("Analyzing single subject {}".format(args.orig_name))
+        print("Analyzing single subject {}".format(args.orig_name))
 
     qc_failed_subject_count = 0
 
@@ -381,13 +382,13 @@ if __name__ == "__main__":
             # Change datatype to np.uint8, else mri_cc will fail!
 
             # get mask
-            LOGGER.info("Creating brainmask based on segmentation...")
+            print("Creating brainmask based on segmentation...")
             bm = rta.create_mask(copy.deepcopy(pred_data), 5, 4)
             mask_name = os.path.join(out_dir, sbj_name, args.brainmask_name)
             eval.save_img(mask_name, bm, orig_img, dtype=np.uint8)
 
             # reduce aparc to aseg and mask regions
-            LOGGER.info("Creating aseg based on segmentation...")
+            print("Creating aseg based on segmentation...")
             aseg = rta.reduce_to_aseg(pred_data)
             aseg[bm == 0] = 0
             aseg = rta.flip_wm_islands(aseg)
@@ -395,7 +396,7 @@ if __name__ == "__main__":
             eval.save_img(aseg_name, aseg, orig_img, dtype=np.uint8)
 
             # Run QC check
-            LOGGER.info("Running volume-based QC check on segmentation...")
+            print("Running volume-based QC check on segmentation...")
             seg_voxvol = np.product(orig_img.header.get_zooms())
             if not check_volume(pred_data, seg_voxvol):
                 LOGGER.warning("Total segmentation volume is too small. Segmentation may be corrupted.")
@@ -416,7 +417,7 @@ if __name__ == "__main__":
             LOGGER.error("Single subject failed the volume-based QC check.")
             sys.exit(1)
     else:
-        LOGGER.info("Segmentations from {} out of {} processed cases failed the volume-based QC check.".format(
+        print("Segmentations from {} out of {} processed cases failed the volume-based QC check.".format(
             qc_failed_subject_count, len(s_dirs)))
 
     sys.exit(0)

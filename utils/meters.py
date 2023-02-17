@@ -27,6 +27,7 @@ from utils.misc import plot_confusion_matrix
 logger = logging.getLogger(__name__)
 
 
+# For Tensorboard Writing
 class Meter:
     def __init__(self,
                  cfg,

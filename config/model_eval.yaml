@@ -22,12 +22,12 @@ MODEL:
   OUT_TENSOR_WIDTH: 320
   OUT_TENSOR_HEIGHT: 320
 
+
 DATA:
   SIZES: [256, 311, 320]
   PADDED_SIZE: 320
   PLANE: "axial"
-  PATH_HDF5_TRAIN: "./dataset/70-11/train_axial.hdf5"
-  PATH_HDF5_VAL: "./dataset/70-11/test_axial.hdf5"
+  PATH_HDF5_VAL: "./dataset/140-20/val_axial.hdf5"
   AUG: ["None", "Gaussian"]
 
 DATA_LOADER:
@@ -37,8 +37,7 @@ DATA_LOADER:
 OPTIMIZER:
   LR_SCHEDULER: cosineWarmRestarts
   OPTIMIZING_METHOD: "adamW"
-
-  BASE_LR: 0.007
+  BASE_LR: 0.01
   GAMMA: 0.3
   STEP_SIZE: 5
   ETA_MIN: 0.0001
@@ -50,10 +49,11 @@ OPTIMIZER:
   WEIGHT_DECAY: 0.0001
 
 TRAIN:
-  NUM_EPOCHS: 30
-  BATCH_SIZE: 4
+  NUM_EPOCHS: 0
+  BATCH_SIZE: 1
   LOG_INTERVAL: 50
   NUM_STEPS: 10
+  NUM_EPOCHS: 3
   FINE_TUNE: false
   CHECKPOINT_PERIOD: 2
   NUM_WORKERS: 0
@@ -61,10 +61,9 @@ TRAIN:
   RESUME_EXPR_NUM: "Default"
 
 TEST:
-  BATCH_SIZE: 16
+  BATCH_SIZE: 1
 
 LOG_DIR: "./experiments"
-EXPR_NUM: "Setting for 70sub train-11 validation"
+EXPR_NUM: "Testingtesting"
 RNG_SEED: 1
 NUM_GPUS: 1
-# SUMMARY_PATH: "FastSurferVINN/summary"
